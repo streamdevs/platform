@@ -24,10 +24,18 @@ jobs:
     - run: yarn build
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
-        version: '315.0.0'
+        version: '318.0.0'
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
-    - run: gcloud builds submit --pack "image=gcr.io/$GCP_PROJECT_ID/platform"
+    - run: gcloud builds submit --tag "gcr.io/$GCP_PROJECT_ID/platform:$GITHUB_SHA"
       env:
         GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    # Deploy image to Cloud Run
+    - name: Deploy
+      run: |-
+        gcloud run deploy "$SERVICE_NAME" \
+          --quiet \
+          --image "gcr.io/$PROJECT_ID/platform:$GITHUB_SHA" \
+          --platform "managed" \
+          --allow-unauthenticated
