@@ -28,6 +28,6 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
-    - run: gcloud builds submit --pack image=gcr.io/$GCP_PROJECT_ID/platform
+    - run: gcloud builds submit --pack "image=gcr.io/$GCP_PROJECT_ID/platform"
       env:
         GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
