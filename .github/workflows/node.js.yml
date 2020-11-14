@@ -1,13 +1,17 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Build and Deploy to Cloud Run
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: platform
 
 jobs:
   build:
@@ -33,15 +37,11 @@ jobs:
       run: |-
         gcloud builds submit \
           --quiet \
-          --tag "gcr.io/$GCP_PROJECT_ID/platform:$GITHUB_SHA"
-      env:
-        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
     - name: Deploy
       run: |-
         gcloud run deploy "$SERVICE_NAME" \
           --quiet \
-          --image "gcr.io/$GCP_PROJECT_ID/platform:$GITHUB_SHA" \
+          --image "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA" \
           --platform "managed" \
           --allow-unauthenticated
-      env:
-        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
