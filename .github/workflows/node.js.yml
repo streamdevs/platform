@@ -11,6 +11,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  RUN_REGION: europe-west1
   SERVICE_NAME: platform
 
 jobs:
@@ -42,6 +43,7 @@ jobs:
       run: |-
         gcloud run deploy "$SERVICE_NAME" \
           --quiet \
+          --region "$RUN_REGION" \
           --image "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA" \
           --platform "managed" \
           --allow-unauthenticated
