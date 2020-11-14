@@ -35,11 +35,13 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
     - name: Build docker image using Cloud Build
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |-
         gcloud builds submit \
           --quiet \
           --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
     - name: Deploy
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |-
         gcloud run deploy "$SERVICE_NAME" \
           --quiet \
