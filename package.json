@@ -9,6 +9,13 @@
     "start:prod": "next start -p $PORT"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.0.0",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.12",
+    "framer-motion": "^2.9.4",
     "next": "10.0.1",
     "react": "17.0.1",
     "react-dom": "17.0.1"
