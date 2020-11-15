@@ -1,9 +1,9 @@
 {
-  "apiKey": "AIzaSyBrv_DmvmAyDGYX_WzItz5lRpHcKb7KA30",
-  "authDomain": "streamdevs-platform-prod.firebaseapp.com",
-  "databaseURL": "https://streamdevs-platform-prod.firebaseio.com",
-  "projectId": "streamdevs-platform-prod",
-  "storageBucket": "streamdevs-platform-prod.appspot.com",
-  "messagingSenderId": "87935000782",
-  "appId": "1:87935000782:web:45061e0c904ad8e199b09f"
+	"apiKey": "AIzaSyBrv_DmvmAyDGYX_WzItz5lRpHcKb7KA30",
+	"authDomain": "streamdevs-platform-prod.firebaseapp.com",
+	"databaseURL": "https://streamdevs-platform-prod.firebaseio.com",
+	"projectId": "streamdevs-platform-prod",
+	"storageBucket": "streamdevs-platform-prod.appspot.com",
+	"messagingSenderId": "87935000782",
+	"appId": "1:87935000782:web:45061e0c904ad8e199b09f"
 }

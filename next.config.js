@@ -1,8 +1,8 @@
 // We update the config following: https://github.com/FirebaseExtended/reactfire/issues/234
 module.exports = {
-  reactStrictMode: true,
+	reactStrictMode: true,
 
-  experimental: {
-    reactMode: "concurrent", // or you can make it blocking
-  },
+	experimental: {
+		reactMode: 'concurrent', // or you can make it blocking
+	},
 };
