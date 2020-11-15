@@ -1,3 +1,4 @@
+// We update the config following: https://github.com/FirebaseExtended/reactfire/issues/234
 module.exports = {
   reactStrictMode: true,
 
