@@ -1,5 +1,7 @@
 module.exports = {
-    experimental: {
-        reactMode: 'concurrent'
-    }
+  reactStrictMode: true,
+
+  experimental: {
+    reactMode: "concurrent", // or you can make it blocking
+  },
 };
