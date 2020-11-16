@@ -19,7 +19,7 @@ export default function Home() {
 	const router = useRouter();
 	const [show, setShow] = useState(false);
 	const [url] = useState(
-		`${location.protocol}//${location.host}/webhook/github?token=${user?.uid}`,
+		`${location.protocol}//${location.host}/api/webhook/github?token=${user?.uid}`,
 	);
 	const { hasCopied, onCopy } = useClipboard(url);
 
