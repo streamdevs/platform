@@ -15,10 +15,12 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.12",
+    "firebase": "7",
     "framer-motion": "^2.9.4",
     "next": "10.0.1",
-    "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react": "^0.0.0-experimental-4ead6b530",
+    "react-dom": "^0.0.0-experimental-4ead6b530",
+    "reactfire": "^2.0.3"
   },
   "devDependencies": {
     "@types/node": "^14.14.7",
