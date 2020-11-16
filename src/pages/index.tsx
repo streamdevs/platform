@@ -18,7 +18,9 @@ export default function Home() {
 	const user = useUser<firebase.User>();
 	const router = useRouter();
 	const [show, setShow] = useState(false);
-	const [url] = useState(`${location.protocol}//${location.host}/webhook/github?token=${user.uid}`);
+	const [url] = useState(
+		`${location.protocol}//${location.host}/webhook/github?token=${user?.uid}`,
+	);
 	const { hasCopied, onCopy } = useClipboard(url);
 
 	useEffect(() => {
