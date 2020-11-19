@@ -29,7 +29,7 @@
 		"framer-motion": "^2.9.4",
 		"next": "10.0.1",
 		"next-connect": "^0.9.1",
-		"react": "^0.0.0-experimental-4ead6b530",
+		"react": "^0.14.0",
 		"react-dom": "^0.0.0-experimental-4ead6b530",
 		"reactfire": "^2.0.3"
 	},
