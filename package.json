@@ -15,6 +15,7 @@
 		"format": "yarn run ci:format --write",
 		"cy:open": "cypress open",
 		"cy:run": "cypress run",
+		"firebase:emulators:start": "firebase emulators:start",
 		"test:cy": "firebase emulators:exec 'yarn start-server-and-test start:test http://localhost:3000 cy:run'"
 	},
 	"dependencies": {
