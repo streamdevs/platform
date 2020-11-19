@@ -1,14 +1,15 @@
 import { Button, Center, Stack, Text } from '@chakra-ui/react';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as firebase from 'firebase/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { useAuth, useUser } from 'reactfire';
+import { useUser } from 'reactfire';
+
+import { useAuth } from '../hooks/useAuth';
 
 export default function Home() {
-	const auth = useAuth();
+	const { signInWithGitHub } = useAuth();
 	const user = useUser();
 	const router = useRouter();
 
@@ -29,7 +30,7 @@ export default function Home() {
 					<Text align="center">We're in a closed beta</Text>
 					<Button
 						onClick={() => {
-							auth.signInWithPopup(new firebase.auth.GithubAuthProvider());
+							signInWithGitHub();
 						}}
 					>
 						<Stack direction={'row'}>

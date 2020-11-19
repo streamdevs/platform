@@ -11,19 +11,21 @@ import {
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useAuth, useUser } from 'reactfire';
+import { useUser } from 'reactfire';
+
+import { useAuth } from '../hooks/useAuth';
 
 export default function Home() {
-	const auth = useAuth();
+	const { signOut } = useAuth();
 	const user = useUser<firebase.User>();
 	const router = useRouter();
 	const [show, setShow] = useState(false);
-	const [url] = useState(
-		`${location.protocol}//${location.host}/api/webhook/github?token=${user?.uid}`,
-	);
+	const [url, setUrl] = useState('');
 	const { hasCopied, onCopy } = useClipboard(url);
 
 	useEffect(() => {
+		setUrl(`${location.protocol}//${location.host}/api/webhook/github?token=${user?.uid}`);
+
 		if (!user) {
 			router.push('/login');
 		}
@@ -53,7 +55,7 @@ export default function Home() {
 					</InputGroup>
 					<Button
 						onClick={() => {
-							auth.signOut();
+							signOut();
 						}}
 					>
 						<Text>Logout</Text>

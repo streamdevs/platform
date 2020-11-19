@@ -28,6 +28,9 @@ jobs:
       - run: 'yarn ci:format'
       - run: 'yarn ci:lint'
       - run: yarn build
+      - uses: cypress-io/github-action@v2
+        with:
+          command: 'yarn test:cy'
       - name: Setup gcloud
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
