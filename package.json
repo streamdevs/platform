@@ -24,6 +24,7 @@
 		"@emotion/styled": "^11.0.0",
 		"@fortawesome/fontawesome-svg-core": "^1.2.32",
 		"@fortawesome/free-brands-svg-icons": "^5.15.1",
+		"@fortawesome/free-solid-svg-icons": "^5.15.1",
 		"@fortawesome/react-fontawesome": "^0.1.12",
 		"firebase": "^7.0.0",
 		"framer-motion": "^2.9.4",

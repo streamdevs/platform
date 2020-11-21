@@ -13,10 +13,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useUser } from 'reactfire';
 
-import { useAuth } from '../hooks/useAuth';
+import { Layout } from '../components/Layout';
 
 export default function Home() {
-	const { signOut } = useAuth();
 	const user = useUser<firebase.User>();
 	const router = useRouter();
 	const [show, setShow] = useState(false);
@@ -32,10 +31,9 @@ export default function Home() {
 	}, [user]);
 
 	return (
-		<div>
+		<Layout>
 			<Head>
-				<title>streamdevs.app</title>
-				<link rel="icon" href="/favicon.ico" />
+				<title>Home | streamdevs.app</title>
 			</Head>
 			<Center minH="100vh" display="flex">
 				<Stack spacing={3}>
@@ -53,15 +51,8 @@ export default function Home() {
 							</Stack>
 						</InputRightElement>
 					</InputGroup>
-					<Button
-						onClick={() => {
-							signOut();
-						}}
-					>
-						<Text>Logout</Text>
-					</Button>
 				</Stack>
 			</Center>
-		</div>
+		</Layout>
 	);
 }
