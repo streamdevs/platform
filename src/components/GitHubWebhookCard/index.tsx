@@ -4,6 +4,7 @@ import {
 	Input,
 	InputGroup,
 	InputRightElement,
+	Skeleton,
 	Stack,
 	useClipboard,
 } from '@chakra-ui/react';
@@ -27,19 +28,21 @@ export const GitHubWebhookCard = () => {
 			<Heading as="h2" size="md">
 				GitHub webhook URL:
 			</Heading>
-			<InputGroup>
-				<Input pr="8rem" type={show ? 'text' : 'password'} defaultValue={url} />
-				<InputRightElement width="8rem">
-					<Stack spacing={1} direction="row" justify="right">
-						<Button h="1.75rem" width="3rem" size="sm" onClick={onCopy}>
-							{hasCopied ? 'Copied' : 'Copy'}
-						</Button>
-						<Button h="1.75rem" width="3rem" size="sm" onClick={() => setShow((show) => !show)}>
-							{show ? 'Hide' : 'Show'}
-						</Button>
-					</Stack>
-				</InputRightElement>
-			</InputGroup>
+			<Skeleton isLoaded={!!user}>
+				<InputGroup>
+					<Input pr="8rem" type={show ? 'text' : 'password'} defaultValue={url} />
+					<InputRightElement width="8rem">
+						<Stack spacing={1} direction="row" justify="right">
+							<Button h="1.75rem" width="3rem" size="sm" onClick={onCopy}>
+								{hasCopied ? 'Copied' : 'Copy'}
+							</Button>
+							<Button h="1.75rem" width="3rem" size="sm" onClick={() => setShow((show) => !show)}>
+								{show ? 'Hide' : 'Show'}
+							</Button>
+						</Stack>
+					</InputRightElement>
+				</InputGroup>
+			</Skeleton>
 		</Card>
 	);
 };
