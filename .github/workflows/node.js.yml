@@ -28,12 +28,13 @@ jobs:
       - run: 'yarn ci:format'
       - run: 'yarn ci:lint'
       - run: yarn build
-      - uses: cypress-io/github-action@v2
+      - name: Setup Cypress
+        uses: cypress-io/github-action@v2
         with:
           command: 'yarn test:cy'
       - name: Setup gcloud
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: GoogleCloudPlatform/google-github-actions/setup-gcloud@master
         with:
           version: '318.0.0'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
