@@ -35,6 +35,7 @@ export const Layout = ({ children }: PropsWithChildren<Props>) => {
 				</Box>
 				<Stack display="flex" alignItems="center" direction="row">
 					<Button
+						display={{ base: 'none', md: 'inherit' }}
 						onClick={() => {
 							toggleColorMode();
 						}}
@@ -53,7 +54,8 @@ export const Layout = ({ children }: PropsWithChildren<Props>) => {
 						>
 							<Stack direction={'row'}>
 								<FontAwesomeIcon icon={faGithub} />
-								<Text>Login with GitHub</Text>
+								<Text display={{ base: 'none', md: 'inherit' }}>Login with GitHub</Text>
+								<Text display={{ base: 'inherit', md: 'none' }}>Login</Text>
 							</Stack>
 						</Button>
 					)}
