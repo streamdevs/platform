@@ -1,4 +1,5 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import Head from 'next/head';
 import { Suspense } from 'react';
 import { FirebaseAppProvider } from 'reactfire';
 
@@ -12,12 +13,18 @@ const customTheme = extendTheme({ config });
 
 export default function MyApp({ Component, pageProps }) {
 	return (
-		<ChakraProvider theme={customTheme}>
-			<FirebaseAppProvider firebaseConfig={firebaseConfig}>
-				<Suspense fallback="loading">
-					<Component {...pageProps} />
-				</Suspense>
-			</FirebaseAppProvider>
-		</ChakraProvider>
+		<>
+			<Head>
+				<title>streamdevs.app</title>
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
+			<ChakraProvider theme={customTheme}>
+				<FirebaseAppProvider firebaseConfig={firebaseConfig}>
+					<Suspense fallback="loading">
+						<Component {...pageProps} />
+					</Suspense>
+				</FirebaseAppProvider>
+			</ChakraProvider>
+		</>
 	);
 }
