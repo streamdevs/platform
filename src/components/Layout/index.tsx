@@ -1,4 +1,14 @@
-import { Box, Button, Heading, Image, Stack, Text, useColorMode, useTheme } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Container,
+	Heading,
+	Image,
+	Stack,
+	Text,
+	useColorMode,
+	useTheme,
+} from '@chakra-ui/react';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -70,7 +80,7 @@ export const Layout = ({ children }: PropsWithChildren<Props>) => {
 					)}
 				</Stack>
 			</Box>
-			{children}
+			<Container mt={theme.space[4]}>{children}</Container>
 		</>
 	);
 };
