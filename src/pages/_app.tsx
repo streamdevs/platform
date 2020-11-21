@@ -1,4 +1,4 @@
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Center, ChakraProvider, extendTheme, Spinner } from '@chakra-ui/react';
 import Head from 'next/head';
 import { Suspense } from 'react';
 import { FirebaseAppProvider } from 'reactfire';
@@ -20,7 +20,13 @@ export default function MyApp({ Component, pageProps }) {
 			</Head>
 			<ChakraProvider theme={customTheme}>
 				<FirebaseAppProvider firebaseConfig={firebaseConfig}>
-					<Suspense fallback="loading">
+					<Suspense
+						fallback={
+							<Center minH="100vh">
+								<Spinner size="xl" />
+							</Center>
+						}
+					>
 						<Component {...pageProps} />
 					</Suspense>
 				</FirebaseAppProvider>
