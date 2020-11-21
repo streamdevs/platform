@@ -34,7 +34,7 @@ jobs:
           command: 'yarn test:cy'
       - name: Setup gcloud
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: GoogleCloudPlatform/google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@master
         with:
           version: '318.0.0'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
