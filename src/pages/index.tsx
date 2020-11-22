@@ -6,6 +6,7 @@ import { useUser } from 'reactfire';
 
 import { GitHubWebhookCard } from '../components/GitHubWebhookCard';
 import { Layout } from '../components/Layout';
+import { TwitchConfigurationCard } from '../components/TwitchConfigurationCard';
 
 export default function Home() {
 	const user = useUser<firebase.User>();
@@ -25,6 +26,7 @@ export default function Home() {
 			<Layout>
 				<Stack spacing="4">
 					<GitHubWebhookCard />
+					{user && <TwitchConfigurationCard />}
 				</Stack>
 			</Layout>
 		</>
