@@ -16,7 +16,7 @@ on:
       - 'tests/firestore/rules.spec.ts'
 
 jobs:
-  build:
+  test-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,4 +27,3 @@ jobs:
           node-version: 12.x
       - run: yarn
       - run: 'yarn test:rules'
-      
