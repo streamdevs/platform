@@ -27,3 +27,10 @@ jobs:
           node-version: 12.x
       - run: yarn
       - run: 'yarn test:rules'
+      - name: Deploy to Firebase Firestore Security Rules
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: w9jds/firebase-action@master
+        with:
+          args: 'deploy --only firestore:rules'
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
