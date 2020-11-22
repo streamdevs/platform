@@ -28,7 +28,7 @@ export const GitHubWebhookCard = () => {
 			<Heading as="h2" size="md">
 				GitHub webhook URL:
 			</Heading>
-			<Skeleton isLoaded={!!user}>
+			<Skeleton isLoaded={!!url}>
 				<InputGroup>
 					<Input pr="8rem" type={show ? 'text' : 'password'} defaultValue={url} />
 					<InputRightElement width="8rem">
