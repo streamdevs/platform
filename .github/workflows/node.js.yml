@@ -6,8 +6,14 @@ name: Build and Deploy to Cloud Run
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'firestore.rules'
+      - 'tests/firestore/rules.spec.ts'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'firestore.rules'
+      - 'tests/firestore/rules.spec.ts'
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
