@@ -1,9 +1,12 @@
 import {
 	Button,
+	FormControl,
+	FormHelperText,
+	FormLabel,
 	Heading,
 	Input,
 	InputGroup,
-	InputRightElement,
+	Link,
 	Skeleton,
 	Stack,
 } from '@chakra-ui/react';
@@ -50,24 +53,31 @@ const Content = () => {
 			<Heading as="h2" size="md">
 				{streamLabs ? '✅' : '❌'} StreamLabs Token
 			</Heading>
-			<InputGroup>
-				<Input
-					pr="9rem"
-					type={'password'}
-					value={newToken}
-					onChange={(e) => setNewToken(e.target.value)}
-				/>
-				<InputRightElement width="9rem">
-					<Stack spacing={1} direction="row" justify="right">
-						<Button h="1.75rem" width="3.5rem" size="sm" onClick={onSave}>
-							{saving ? 'Saving' : 'Save'}
-						</Button>
-						<Button h="1.75rem" width="3.5rem" size="sm" onClick={onDelete}>
-							{deleting ? 'Deleting' : 'Delete'}
-						</Button>
-					</Stack>
-				</InputRightElement>
-			</InputGroup>
+			<FormControl id="twitch-token">
+				<FormLabel>Token:</FormLabel>
+				<InputGroup>
+					<Input
+						id="twitch-token"
+						type="password"
+						value={newToken}
+						onChange={(e) => setNewToken(e.target.value)}
+					/>
+				</InputGroup>
+				<FormHelperText>
+					A token to use the StreamLabs API. You can get one by using{' '}
+					<Link href="https://github.com/streamdevs/streamlabs-token" isExternal>
+						StreamDevs/streamlabs-token
+					</Link>
+				</FormHelperText>
+			</FormControl>
+			<Stack direction="row" spacing={4} justify="flex-end">
+				<Button variant="outline" onClick={onDelete} isLoading={deleting} loadingText="Deleing">
+					Delete
+				</Button>
+				<Button onClick={onSave} isLoading={saving} loadingText="Saving">
+					Save
+				</Button>
+			</Stack>
 		</>
 	);
 };

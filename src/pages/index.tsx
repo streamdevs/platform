@@ -25,7 +25,7 @@ export default function Home() {
 				<title>Home | streamdevs.app</title>
 			</Head>
 			<Layout>
-				<Stack spacing="4">
+				<Stack spacing="4" mb="8">
 					<GitHubWebhookCard />
 					{user && <TwitchConfigurationCard />}
 					{user && <StreamLabsConfigurationCard />}

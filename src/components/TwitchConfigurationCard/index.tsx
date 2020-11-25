@@ -1,9 +1,12 @@
 import {
 	Button,
+	FormControl,
+	FormHelperText,
+	FormLabel,
 	Heading,
 	Input,
 	InputGroup,
-	InputRightElement,
+	Link,
 	Skeleton,
 	Stack,
 } from '@chakra-ui/react';
@@ -14,23 +17,38 @@ import { useFirestoreDocData, useUser } from 'reactfire';
 import { useFirestore } from '../../hooks/useFirestore';
 import { Card } from '../Card';
 
+interface TwitchConfig {
+	twitch: {
+		token: string;
+		channel: string;
+		bot: string;
+	};
+}
+
 const Content = () => {
 	const [deleting, setDeleting] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [newToken, setNewToken] = useState<string>('');
+	const [newBot, setNewBot] = useState<string>('');
+	const [newChannel, setNewChannel] = useState<string>('');
 
 	const firestore = useFirestore();
 	const user = useUser<firebase.User>();
 	const twitchRef = firestore.doc(`users/${user?.uid}`);
-	const { twitch } = useFirestoreDocData<{ twitch?: { accessToken: string } }>(twitchRef);
+	const { twitch } = useFirestoreDocData<TwitchConfig>(twitchRef);
 
 	useEffect(() => {
-		setNewToken(twitch?.accessToken || '');
+		setNewToken(twitch?.token || '');
+		setNewBot(twitch?.bot || '');
+		setNewChannel(twitch?.channel || '');
 	}, [twitch]);
 
 	const onSave = async () => {
 		setSaving(true);
-		await twitchRef.set({ twitch: { accessToken: newToken } }, { merge: true });
+		await twitchRef.set(
+			{ twitch: { token: newToken, channel: newChannel, bot: newBot } },
+			{ merge: true },
+		);
 		setSaving(false);
 	};
 
@@ -43,26 +61,63 @@ const Content = () => {
 	return (
 		<>
 			<Heading as="h2" size="md">
-				{twitch ? '✅' : '❌'} Twitch Token
+				{twitch?.token && twitch?.bot && twitch?.channel ? '✅' : '❌'} Twitch
 			</Heading>
-			<InputGroup>
-				<Input
-					pr="9rem"
-					type={'password'}
-					value={newToken}
-					onChange={(e) => setNewToken(e.target.value)}
-				/>
-				<InputRightElement width="9rem">
-					<Stack spacing={1} direction="row" justify="right">
-						<Button h="1.75rem" width="3.5rem" size="sm" onClick={onSave}>
-							{saving ? 'Saving' : 'Save'}
-						</Button>
-						<Button h="1.75rem" width="3.5rem" size="sm" onClick={onDelete}>
-							{deleting ? 'Deleting' : 'Delete'}
-						</Button>
-					</Stack>
-				</InputRightElement>
-			</InputGroup>
+			<FormControl id="twitch-bot-name">
+				<FormLabel>Bot name:</FormLabel>
+				<InputGroup>
+					<Input
+						id="twitch-bot-name"
+						type="text"
+						value={newBot}
+						onChange={(e) => setNewBot(e.target.value)}
+					/>
+				</InputGroup>
+				<FormHelperText>
+					The account (username) that the chatbot uses to send chat messages.
+				</FormHelperText>
+			</FormControl>
+			<FormControl id="twitch-channel">
+				<FormLabel>Channel:</FormLabel>
+				<InputGroup>
+					<Input
+						id="twitch-channel"
+						type="text"
+						value={newChannel}
+						onChange={(e) => setNewChannel(e.target.value)}
+					/>
+				</InputGroup>
+				<FormHelperText>
+					The Twitch channel name where you want to run the bot. Usually this is your main Twitch
+					account.
+				</FormHelperText>
+			</FormControl>
+			<FormControl id="twitch-token">
+				<FormLabel>Token:</FormLabel>
+				<InputGroup>
+					<Input
+						id="twitch-token"
+						type="password"
+						value={newToken}
+						onChange={(e) => setNewToken(e.target.value)}
+					/>
+				</InputGroup>
+				<FormHelperText>
+					The token to authenticate your chatbot. Generate this with{' '}
+					<Link href="https://twitchapps.com/tmi/" isExternal>
+						https://twitchapps.com/tmi/
+					</Link>
+					, while logged in to your chatbot account. The token will be an alphanumeric string.
+				</FormHelperText>
+			</FormControl>
+			<Stack direction="row" spacing={4} justify="flex-end">
+				<Button variant="outline" onClick={onDelete} isLoading={deleting} loadingText="Deleing">
+					Delete
+				</Button>
+				<Button onClick={onSave} isLoading={saving} loadingText="Saving">
+					Save
+				</Button>
+			</Stack>
 		</>
 	);
 };

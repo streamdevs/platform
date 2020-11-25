@@ -36,6 +36,9 @@ export const Layout = ({ children }: PropsWithChildren<Props>) => {
 				p={4}
 				backgroundColor={colorMode === 'light' ? theme.colors.white : theme.colors.gray[700]}
 				borderBottom={`5px solid ${theme.colors.yellow[500]}`}
+				position="sticky"
+				top="0"
+				zIndex="99"
 			>
 				<Box display="flex" alignItems="center">
 					<Image height="32px" src="/favicon.ico" />
