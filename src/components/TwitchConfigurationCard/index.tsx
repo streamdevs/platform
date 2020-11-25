@@ -9,8 +9,9 @@ import {
 } from '@chakra-ui/react';
 import * as firebase from 'firebase/app';
 import { Suspense, useEffect, useState } from 'react';
-import { useFirestore, useFirestoreDocData, useUser } from 'reactfire';
+import { useFirestoreDocData, useUser } from 'reactfire';
 
+import { useFirestore } from '../../hooks/useFirestore';
 import { Card } from '../Card';
 
 const Content = () => {
