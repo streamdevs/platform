@@ -6,6 +6,7 @@ import { useUser } from 'reactfire';
 
 import { GitHubWebhookCard } from '../components/GitHubWebhookCard';
 import { Layout } from '../components/Layout';
+import { StreamLabsConfigurationCard } from '../components/StreamLabsConfigurationCard';
 import { TwitchConfigurationCard } from '../components/TwitchConfigurationCard';
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
 				<Stack spacing="4">
 					<GitHubWebhookCard />
 					{user && <TwitchConfigurationCard />}
+					{user && <StreamLabsConfigurationCard />}
 				</Stack>
 			</Layout>
 		</>
