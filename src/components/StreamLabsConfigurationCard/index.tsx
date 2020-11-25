@@ -21,29 +21,34 @@ const Content = () => {
 
 	const firestore = useFirestore();
 	const user = useUser<firebase.User>();
-	const twitchRef = firestore.doc(`users/${user?.uid}`);
-	const { twitch } = useFirestoreDocData<{ twitch?: { accessToken: string } }>(twitchRef);
+	const streamLabsRef = firestore.doc(`users/${user?.uid}`);
+	const { streamLabs } = useFirestoreDocData<{ streamLabs?: { accessToken: string } }>(
+		streamLabsRef,
+	);
 
 	useEffect(() => {
-		setNewToken(twitch?.accessToken || '');
-	}, [twitch]);
+		setNewToken(streamLabs?.accessToken || '');
+	}, [streamLabs]);
 
 	const onSave = async () => {
 		setSaving(true);
-		await twitchRef.set({ twitch: { accessToken: newToken } }, { merge: true });
+		await streamLabsRef.set({ streamLabs: { accessToken: newToken } }, { merge: true });
 		setSaving(false);
 	};
 
 	const onDelete = async () => {
 		setDeleting(true);
-		await twitchRef.set({ twitch: firebase.firestore.FieldValue.delete() }, { merge: true });
+		await streamLabsRef.set(
+			{ streamLabs: firebase.firestore.FieldValue.delete() },
+			{ merge: true },
+		);
 		setDeleting(false);
 	};
 
 	return (
 		<>
 			<Heading as="h2" size="md">
-				{twitch ? '✅' : '❌'} Twitch Token
+				{streamLabs ? '✅' : '❌'} StreamLabs Token
 			</Heading>
 			<InputGroup>
 				<Input
@@ -67,7 +72,7 @@ const Content = () => {
 	);
 };
 
-export const TwitchConfigurationCard = () => {
+export const StreamLabsConfigurationCard = () => {
 	return (
 		<Card>
 			<Suspense
