@@ -33,6 +33,7 @@ jobs:
       - run: yarn
       - run: 'yarn ci:format'
       - run: 'yarn ci:lint'
+      - run: yarn test
       - run: yarn build
       - name: Setup Cypress
         uses: cypress-io/github-action@v2
