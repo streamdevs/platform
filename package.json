@@ -16,7 +16,7 @@
 		"cy:open": "cypress open",
 		"cy:run": "cypress run",
 		"test:watch": "yarn test --watch",
-		"test": "FIRESTORE_EMULATOR_HOST=\"localhost:8080\" jest --testPathIgnorePatterns tests/firestore --testPathIgnorePatterns cypress",
+		"test": "FIRESTORE_EMULATOR_HOST=\"localhost:8080\" jest --testPathIgnorePatterns tests/firestore",
 		"test:cy": "firebase emulators:exec 'yarn start-server-and-test start:test http://localhost:3000 cy:run'",
 		"test:rules:watch": "firebase emulators:exec --only firestore 'jest --watch tests/firestore/rules.spec.ts --detectOpenHandles'",
 		"test:rules": "firebase emulators:exec --only firestore 'jest tests/firestore/rules.spec.ts --detectOpenHandles'"
