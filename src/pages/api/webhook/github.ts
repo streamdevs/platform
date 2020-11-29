@@ -9,7 +9,13 @@ import { TwitchChat } from '../../../services/TwitchChat';
 
 const app = admin.initializeApp();
 
-export default nc<NextApiRequest, NextApiResponse>().post(async (req, res) => {
+export default nc<NextApiRequest, NextApiResponse>({
+	onError: (err, req, res) => {
+		console.log(err);
+
+		res.status(500).end(JSON.stringify({ error: err.toString() }));
+	},
+}).post(async (req, res) => {
 	const { token } = qs.parse(req.url.split('?')[1]);
 
 	if (undefined === token) {
