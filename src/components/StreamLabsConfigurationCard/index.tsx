@@ -14,8 +14,11 @@ import * as firebase from 'firebase/app';
 import { Suspense, useEffect, useState } from 'react';
 import { useFirestoreDocData, useUser } from 'reactfire';
 
+import { User } from '../../entities/User';
 import { useFirestore } from '../../hooks/useFirestore';
 import { Card } from '../Card';
+
+type StreamLabsConfig = Pick<User, 'streamLabs'>;
 
 const Content = () => {
 	const [deleting, setDeleting] = useState(false);
@@ -25,9 +28,8 @@ const Content = () => {
 	const firestore = useFirestore();
 	const user = useUser<firebase.User>();
 	const streamLabsRef = firestore.doc(`users/${user?.uid}`);
-	const { streamLabs } = useFirestoreDocData<{ streamLabs?: { accessToken: string } }>(
-		streamLabsRef,
-	);
+
+	const { streamLabs } = useFirestoreDocData<StreamLabsConfig>(streamLabsRef);
 
 	useEffect(() => {
 		setNewToken(streamLabs?.accessToken || '');
