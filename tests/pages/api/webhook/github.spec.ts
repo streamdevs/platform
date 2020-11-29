@@ -30,7 +30,7 @@ describe('/api/webhook/github', () => {
 			url = await listen(server);
 
 			app = admin.initializeApp(undefined, 'test');
-			app.firestore().doc('/users/abc').set(UserBuilder.build());
+			await app.firestore().doc('/users/abc').set(UserBuilder.build());
 		});
 
 		afterAll(async (done) => {

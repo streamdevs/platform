@@ -10,6 +10,7 @@
 		"start:prod": "next start -p $PORT",
 		"ci:lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
 		"ci:format": "prettier --ignore-path .gitignore -l .",
+		"ci:test": "firebase emulators:exec 'yarn test'",
 		"lint": "yarn run ci:lint --fix",
 		"lint-format-staged": "lint-staged",
 		"format": "yarn run ci:format --write",
