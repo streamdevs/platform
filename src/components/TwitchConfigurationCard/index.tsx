@@ -14,16 +14,11 @@ import * as firebase from 'firebase/app';
 import { Suspense, useEffect, useState } from 'react';
 import { useFirestoreDocData, useUser } from 'reactfire';
 
+import { User } from '../../entities/User';
 import { useFirestore } from '../../hooks/useFirestore';
 import { Card } from '../Card';
 
-interface TwitchConfig {
-	twitch: {
-		token: string;
-		channel: string;
-		bot: string;
-	};
-}
+type TwitchConfig = Pick<User, 'twitch'>;
 
 const Content = () => {
 	const [deleting, setDeleting] = useState(false);

@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import http from 'http';
 import fetch from 'isomorphic-unfetch';
 import { apiResolver } from 'next/dist/next-server/server/api-utils';
@@ -6,6 +7,7 @@ import listen from 'test-listen';
 import handler from '../../../../src/pages/api/webhook/github';
 import { StreamLabs } from '../../../../src/services/StreamLabs';
 import { TwitchChat } from '../../../../src/services/TwitchChat';
+import { UserBuilder } from '../../../builders/UserBuilder';
 
 describe('/api/webhook/github', () => {
 	describe('POST /api/webhook/github ', () => {
@@ -13,6 +15,7 @@ describe('/api/webhook/github', () => {
 		let url: string;
 		let spyStreamLabs: jest.SpyInstance<Promise<void>>;
 		let spyTwitchChat: jest.SpyInstance<Promise<void>>;
+		let app: admin.app.App;
 
 		beforeAll(async () => {
 			spyStreamLabs = jest.spyOn(StreamLabs.prototype, 'alert');
@@ -25,9 +28,18 @@ describe('/api/webhook/github', () => {
 				apiResolver(req, res, undefined, handler, undefined, undefined),
 			);
 			url = await listen(server);
+
+			app = admin.initializeApp(undefined, 'test');
+			app.firestore().doc('/users/abc').set(UserBuilder.build());
 		});
 
-		afterAll((done) => {
+		afterAll(async (done) => {
+			await fetch(
+				`http://localhost:8080/emulator/v1/projects/streamdevs-platform-prod/databases/(default)/documents`,
+				{ method: 'DELETE' },
+			);
+			await app.delete();
+
 			server.close(done);
 		});
 
