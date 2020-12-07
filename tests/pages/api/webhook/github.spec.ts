@@ -110,5 +110,39 @@ describe('/api/webhook/github', () => {
 				]),
 			);
 		});
+
+		describe.only('cooldown', () => {
+			it('prevent the same user to trigger the same event twice', async () => {
+				const request = {
+					method: 'POST',
+					body: JSON.stringify({
+						action: 'created',
+						repository: {
+							full_name: 'streamdevs/webhook',
+							html_url: 'https://github.com/streamdevs/webhook',
+						},
+						sender: {
+							login: 'orestes',
+						},
+					}),
+					headers: {
+						'Content-Type': 'application/json',
+						'X-GitHub-Event': 'star',
+					},
+				};
+
+				await fetch(`${url}?token=abc`, request);
+				const response = await fetch(`${url}?token=abc`, request);
+
+				expect(await response.json()).toEqual(
+					expect.arrayContaining([
+						expect.objectContaining({
+							streamlabs: { notified: false, message: expect.any(String) },
+							twitch: { notified: false, message: expect.any(String) },
+						}),
+					]),
+				);
+			});
+		});
 	});
 });
