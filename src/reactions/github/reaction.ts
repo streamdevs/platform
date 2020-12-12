@@ -44,12 +44,12 @@ export abstract class Reaction<P = WebhookPayload> {
 		protected gitEventHistoryRepository: GitEventHistoryRepository,
 	) {}
 
-	abstract getStreamLabsMessage(options: GetMessageOptions<P>): string;
-	abstract getTwitchChatMessage(options: GetMessageOptions<P>): string;
-	abstract canHandle(options: CanHandleOptions<P>): boolean;
-	abstract isValid(options: IsValidOptions<P>): Promise<boolean>;
+	protected abstract getStreamLabsMessage(options: GetMessageOptions<P>): string;
+	protected abstract getTwitchChatMessage(options: GetMessageOptions<P>): string;
+	protected abstract canHandle(options: CanHandleOptions<P>): boolean;
+	protected abstract isValid(options: IsValidOptions<P>): Promise<boolean>;
 
-	private async notifyStreamlabs(options: NotifyOptions<P>): Promise<ReactionStatus> {
+	protected async notifyStreamlabs(options: NotifyOptions<P>): Promise<ReactionStatus> {
 		const { payload } = options;
 
 		if (!(await this.isValid(options))) {
@@ -79,7 +79,7 @@ export abstract class Reaction<P = WebhookPayload> {
 		}
 	}
 
-	private async notifyTwitch(options: NotifyOptions<P>): Promise<ReactionStatus> {
+	protected async notifyTwitch(options: NotifyOptions<P>): Promise<ReactionStatus> {
 		const { payload } = options;
 
 		if (!(await this.isValid(options))) {

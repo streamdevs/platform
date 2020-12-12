@@ -1,18 +1,24 @@
 import { DateTime } from 'luxon';
 
-import { CanHandleOptions, GetMessageOptions, IsValidOptions, Reaction } from './reaction';
+import {
+	CanHandleOptions,
+	GetMessageOptions,
+	HandleOptions,
+	IsValidOptions,
+	Reaction,
+} from './reaction';
 import { StarPayload } from './schemas/star-payload';
 
 export class Star extends Reaction {
-	canHandle({ payload, event }: CanHandleOptions<StarPayload>): boolean {
+	public canHandle({ payload, event }: CanHandleOptions<StarPayload>): boolean {
 		return event === 'star' && payload.action === 'created';
 	}
 
-	getStreamLabsMessage({ payload }: GetMessageOptions<StarPayload>): string {
+	protected getStreamLabsMessage({ payload }: GetMessageOptions<StarPayload>): string {
 		return `*${payload.sender.login}* just starred *${payload.repository.full_name}*`;
 	}
 
-	getTwitchChatMessage({ payload }: GetMessageOptions<StarPayload>): string {
+	protected getTwitchChatMessage({ payload }: GetMessageOptions<StarPayload>): string {
 		return `${payload.sender.login} just starred ${payload.repository.html_url}`;
 	}
 
@@ -27,5 +33,18 @@ export class Star extends Reaction {
 		});
 
 		return !event || DateTime.fromJSDate(event.timestamp) < DateTime.local().minus({ minutes: 5 });
+	}
+
+	public async handle(options: HandleOptions<StarPayload>) {
+		const response = await super.handle(options);
+		await this.gitEventHistoryRepository.saveEvent({
+			event: 'star',
+			repository: options.payload.repository.full_name,
+			sender: options.payload.sender.login,
+			timestamp: new Date(),
+			userId: options.userId,
+		});
+
+		return response;
 	}
 }
