@@ -1,14 +1,30 @@
+import { GitEventHistoryRepository } from '../../repositories/GitEventHistoryRepository';
 import { StreamLabs } from '../../services/StreamLabs';
 import { TwitchChat } from '../../services/TwitchChat';
 import { WebhookPayload } from './schemas/webhook-payload';
 
-export interface ReactionHandleOptions<P = WebhookPayload> {
+export interface IsValidOptions<P = WebhookPayload> {
+	payload: P;
+	userId: string;
+}
+
+export interface GetMessageOptions<P = WebhookPayload> {
 	payload: P;
 }
 
-export interface ReactionCanHandleOptions<P = WebhookPayload> {
+export interface NotifyOptions<P = WebhookPayload> {
+	payload: P;
+	userId: string;
+}
+
+export interface CanHandleOptions<P = WebhookPayload> {
 	payload: P;
 	event: string;
+}
+
+export interface HandleOptions<P = WebhookPayload> {
+	payload: P;
+	userId: string;
 }
 
 export interface ReactionStatus {
@@ -16,14 +32,33 @@ export interface ReactionStatus {
 	message: string;
 }
 
+type HandleReturn = {
+	streamlabs: ReactionStatus;
+	twitchChat: ReactionStatus;
+};
+
 export abstract class Reaction<P = WebhookPayload> {
-	public constructor(private twitchChat: TwitchChat, private streamlabs: StreamLabs) {}
+	public constructor(
+		private twitchChat: TwitchChat,
+		private streamlabs: StreamLabs,
+		protected gitEventHistoryRepository: GitEventHistoryRepository,
+	) {}
 
-	abstract getStreamLabsMessage({ payload }: ReactionHandleOptions<P>): string;
-	abstract getTwitchChatMessage({ payload }: ReactionHandleOptions<P>): string;
-	abstract canHandle({ payload, event }: ReactionCanHandleOptions<P>): boolean;
+	abstract getStreamLabsMessage(options: GetMessageOptions<P>): string;
+	abstract getTwitchChatMessage(options: GetMessageOptions<P>): string;
+	abstract canHandle(options: CanHandleOptions<P>): boolean;
+	abstract isValid(options: IsValidOptions<P>): Promise<boolean>;
 
-	private async notifyStreamlabs({ payload }: ReactionHandleOptions<P>): Promise<ReactionStatus> {
+	private async notifyStreamlabs(options: NotifyOptions<P>): Promise<ReactionStatus> {
+		const { payload } = options;
+
+		if (!(await this.isValid(options))) {
+			return {
+				notified: false,
+				message: '',
+			};
+		}
+
 		try {
 			const message = this.getStreamLabsMessage({ payload });
 			await this.streamlabs.alert({
@@ -44,7 +79,16 @@ export abstract class Reaction<P = WebhookPayload> {
 		}
 	}
 
-	private async notifyTwitch({ payload }: ReactionHandleOptions<P>): Promise<ReactionStatus> {
+	private async notifyTwitch(options: NotifyOptions<P>): Promise<ReactionStatus> {
+		const { payload } = options;
+
+		if (!(await this.isValid(options))) {
+			return {
+				notified: false,
+				message: '',
+			};
+		}
+
 		try {
 			const message = this.getTwitchChatMessage({ payload });
 			await this.twitchChat.send(message);
@@ -63,15 +107,10 @@ export abstract class Reaction<P = WebhookPayload> {
 		}
 	}
 
-	public async handle({
-		payload,
-	}: ReactionHandleOptions<P>): Promise<{
-		streamlabs: ReactionStatus;
-		twitchChat: ReactionStatus;
-	}> {
+	public async handle(options: HandleOptions<P>): Promise<HandleReturn> {
 		const [streamlabs, twitchChat] = await Promise.all([
-			this.notifyStreamlabs({ payload }),
-			this.notifyTwitch({ payload }),
+			this.notifyStreamlabs(options),
+			this.notifyTwitch(options),
 		]);
 
 		return {

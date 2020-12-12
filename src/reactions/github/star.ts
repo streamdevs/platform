@@ -1,42 +1,31 @@
-import * as admin from 'firebase-admin';
 import { DateTime } from 'luxon';
 
-import { Reaction, ReactionCanHandleOptions, ReactionHandleOptions } from './reaction';
+import { CanHandleOptions, GetMessageOptions, IsValidOptions, Reaction } from './reaction';
 import { StarPayload } from './schemas/star-payload';
 
 export class Star extends Reaction {
-	canHandle({ payload, event }: ReactionCanHandleOptions<StarPayload>): boolean {
+	canHandle({ payload, event }: CanHandleOptions<StarPayload>): boolean {
 		return event === 'star' && payload.action === 'created';
 	}
 
-	getStreamLabsMessage({ payload }: ReactionHandleOptions<StarPayload>): string {
+	getStreamLabsMessage({ payload }: GetMessageOptions<StarPayload>): string {
 		return `*${payload.sender.login}* just starred *${payload.repository.full_name}*`;
 	}
 
-	getTwitchChatMessage({ payload }: ReactionHandleOptions<StarPayload>): string {
+	getTwitchChatMessage({ payload }: GetMessageOptions<StarPayload>): string {
 		return `${payload.sender.login} just starred ${payload.repository.html_url}`;
 	}
 
-	public async isValid({
-		userId,
-		payload,
-	}: {
-		userId: string;
-		payload: StarPayload;
-	}): Promise<boolean> {
-		const app = admin.initializeApp();
-		const alreadySent = await app
-			.firestore()
-			.collection(`/events/${userId}-${encodeURIComponent(payload.repository.full_name)}/star`)
-			.where('sender', '==', payload.sender.login)
-			.orderBy('timestamp', 'desc')
-			.limit(1)
-			.get();
+	public async isValid(options: IsValidOptions<StarPayload>): Promise<boolean> {
+		const { userId, payload } = options;
 
-		return (
-			alreadySent.empty ||
-			DateTime.fromJSDate(alreadySent.docs[0].data().timestamp.toDate()) <
-				DateTime.local().minus({ minutes: 5 })
-		);
+		const event = await this.gitEventHistoryRepository.findLastEventFromUser({
+			userId,
+			repository: options.payload.repository.full_name,
+			event: 'star',
+			sender: payload.sender.login,
+		});
+
+		return !event || DateTime.fromJSDate(event.timestamp) < DateTime.local().minus({ minutes: 5 });
 	}
 }
