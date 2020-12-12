@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import qs from 'qs';
 
 import { Star } from '../../../reactions/github/star';
+import { GitEventHistoryRepository } from '../../../repositories/GitEventHistoryRepository';
 import { StreamLabs } from '../../../services/StreamLabs';
 import { TwitchChat } from '../../../services/TwitchChat';
 
@@ -33,8 +34,17 @@ export default nc<NextApiRequest, NextApiResponse>({
 		channel: user.twitch.channel,
 		botToken: user.twitch.token,
 	});
+	const gitEventHistoryRepository = new GitEventHistoryRepository();
 
-	const starReaction = new Star(twitchChat, streamLabs);
+	const starReaction = new Star(twitchChat, streamLabs, gitEventHistoryRepository);
 
-	res.json([await starReaction.handle({ payload: req.body })]);
+	const payload = req.body;
+	const event = req.headers['x-github-event']?.toString();
+
+	if (starReaction.canHandle({ payload, event })) {
+		res.json([await starReaction.handle({ payload: req.body, userId: token.toString() })]);
+		return;
+	}
+
+	res.end();
 });

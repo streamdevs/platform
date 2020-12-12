@@ -5,6 +5,7 @@ import { apiResolver } from 'next/dist/next-server/server/api-utils';
 import listen from 'test-listen';
 
 import handler from '../../../../src/pages/api/webhook/github';
+import { StarPayload } from '../../../../src/reactions/github/schemas/star-payload';
 import { StreamLabs } from '../../../../src/services/StreamLabs';
 import { TwitchChat } from '../../../../src/services/TwitchChat';
 import { UserBuilder } from '../../../builders/UserBuilder';
@@ -16,6 +17,7 @@ describe('/api/webhook/github', () => {
 		let spyStreamLabs: jest.SpyInstance<Promise<void>>;
 		let spyTwitchChat: jest.SpyInstance<Promise<void>>;
 		let app: admin.app.App;
+		let payload: StarPayload;
 
 		beforeAll(async () => {
 			spyStreamLabs = jest.spyOn(StreamLabs.prototype, 'alert');
@@ -30,14 +32,31 @@ describe('/api/webhook/github', () => {
 			url = await listen(server);
 
 			app = admin.initializeApp(undefined, 'test');
+
+			payload = {
+				action: 'created',
+				repository: {
+					full_name: 'streamdevs/webhook',
+					html_url: 'https://github.com/streamdevs/webhook',
+				},
+				sender: {
+					login: 'orestes',
+				},
+			};
+		});
+
+		beforeEach(async () => {
 			await app.firestore().doc('/users/abc').set(UserBuilder.build());
 		});
 
-		afterAll(async (done) => {
+		afterEach(async () => {
 			await fetch(
 				`http://localhost:8080/emulator/v1/projects/streamdevs-platform-prod/databases/(default)/documents`,
 				{ method: 'DELETE' },
 			);
+		});
+
+		afterAll(async (done) => {
 			await app.delete();
 
 			server.close(done);
@@ -58,16 +77,7 @@ describe('/api/webhook/github', () => {
 		it('returns the streamLab message', async () => {
 			const response = await fetch(`${url}?token=abc`, {
 				method: 'POST',
-				body: JSON.stringify({
-					action: 'created',
-					repository: {
-						full_name: 'streamdevs/webhook',
-						html_url: 'https://github.com/streamdevs/webhook',
-					},
-					sender: {
-						login: 'orestes',
-					},
-				}),
+				body: JSON.stringify(payload),
 				headers: {
 					'Content-Type': 'application/json',
 					'X-GitHub-Event': 'star',
@@ -86,16 +96,7 @@ describe('/api/webhook/github', () => {
 		it('returns the twitch message', async () => {
 			const response = await fetch(`${url}?token=abc`, {
 				method: 'POST',
-				body: JSON.stringify({
-					action: 'created',
-					repository: {
-						full_name: 'streamdevs/webhook',
-						html_url: 'https://github.com/streamdevs/webhook',
-					},
-					sender: {
-						login: 'orestes',
-					},
-				}),
+				body: JSON.stringify(payload),
 				headers: {
 					'Content-Type': 'application/json',
 					'X-GitHub-Event': 'star',
@@ -109,6 +110,31 @@ describe('/api/webhook/github', () => {
 					}),
 				]),
 			);
+		});
+
+		describe('cooldown', () => {
+			it('prevent the same user to trigger the same event twice', async () => {
+				const request = {
+					method: 'POST',
+					body: JSON.stringify(payload),
+					headers: {
+						'Content-Type': 'application/json',
+						'X-GitHub-Event': 'star',
+					},
+				};
+
+				await fetch(`${url}?token=abc`, request);
+				const response = await fetch(`${url}?token=abc`, request);
+
+				expect(await response.json()).toEqual(
+					expect.arrayContaining([
+						expect.objectContaining({
+							streamlabs: { notified: false, message: expect.any(String) },
+							twitchChat: { notified: false, message: expect.any(String) },
+						}),
+					]),
+				);
+			});
 		});
 	});
 });

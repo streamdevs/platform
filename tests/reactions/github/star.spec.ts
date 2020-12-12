@@ -2,16 +2,23 @@ import { StreamLabsMock } from '../../__mocks__/StreamLabs';
 import { TwitchChatMock } from '../../__mocks__/TwitchChat';
 import { StarPayload } from '../../../src/reactions/github/schemas/star-payload';
 import { Star } from '../../../src/reactions/github/star';
+import { GitEventHistoryRepository } from '../../../src/repositories/GitEventHistoryRepository';
+import { GitEventBuilder } from '../../builders/GitEventBuilder';
+
+const testBuilder = () => {
+	const twitchChat: TwitchChatMock = new TwitchChatMock();
+	const streamlabs: StreamLabsMock = new StreamLabsMock();
+	const gitEventHistoryRepository: GitEventHistoryRepository = ({
+		findLastEventFromUser: jest.fn(),
+		saveEvent: jest.fn(),
+	} as undefined) as GitEventHistoryRepository;
+
+	const subject = new Star(twitchChat, streamlabs, gitEventHistoryRepository);
+
+	return { twitchChat, streamlabs, gitEventHistoryRepository, subject };
+};
 
 describe('Star', () => {
-	let twitchChat: TwitchChatMock;
-	let streamlabs: StreamLabsMock;
-
-	beforeEach(() => {
-		twitchChat = new TwitchChatMock();
-		streamlabs = new StreamLabsMock();
-	});
-
 	describe('#handle', () => {
 		let payload: StarPayload;
 
@@ -28,58 +35,128 @@ describe('Star', () => {
 			};
 		});
 
-		it("returns 'twitchChat.notified' set to false if something goes wrong in TwitchChat ", async () => {
-			twitchChat.send.mockImplementationOnce(async () => {
-				throw new Error('boom');
+		describe('dealing with TwitchChat', () => {
+			it("returns 'notified' set to false if something goes wrong", async () => {
+				const { twitchChat, subject } = testBuilder();
+				twitchChat.send.mockImplementationOnce(async () => {
+					throw new Error('boom');
+				});
+
+				const {
+					twitchChat: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
+
+				expect(notified).toEqual(false);
 			});
-			const subject = new Star(twitchChat, streamlabs);
 
-			const {
-				twitchChat: { notified },
-			} = await subject.handle({ payload });
+			it("returns the 'message' and 'notified' set to true", async () => {
+				const { subject } = testBuilder();
 
-			expect(notified).toEqual(false);
+				const { twitchChat: response } = await subject.handle({ payload, userId: 'abc' });
+
+				expect(response).toEqual({
+					message: `${payload.sender.login} just starred ${payload.repository.html_url}`,
+					notified: true,
+				});
+			});
+
+			it("returns 'notified' set to false if the sender is a spammer", async () => {
+				const { subject, gitEventHistoryRepository } = testBuilder();
+				jest
+					.spyOn(gitEventHistoryRepository, 'findLastEventFromUser')
+					.mockImplementation(async () =>
+						GitEventBuilder.build({ sender: payload.sender.login, timestamp: new Date() }),
+					);
+
+				const {
+					twitchChat: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
+
+				expect(notified).toEqual(false);
+			});
+
+			it("returns 'notified' set to true if user sender has an event older than 5 minutes", async () => {
+				const { subject, gitEventHistoryRepository } = testBuilder();
+				jest
+					.spyOn(gitEventHistoryRepository, 'findLastEventFromUser')
+					.mockImplementation(async () =>
+						GitEventBuilder.build({
+							sender: payload.sender.login,
+							timestamp: new Date('2020-10-20'),
+						}),
+					);
+
+				const {
+					twitchChat: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
+
+				expect(notified).toEqual(true);
+			});
 		});
 
-		it("returns 'twitchChat' with the message send to Twitch and notified set to true", async () => {
-			const subject = new Star(twitchChat, streamlabs);
+		describe("dealing with 'StreamLabs'", () => {
+			it("returns 'notified' set to false if something goes wrong", async () => {
+				const { subject, streamlabs } = testBuilder();
+				streamlabs.alert.mockImplementationOnce(async () => {
+					throw new Error('boooom');
+				});
 
-			const { twitchChat: response } = await subject.handle({ payload });
+				const {
+					streamlabs: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
 
-			expect(response).toEqual({
-				message: `${payload.sender.login} just starred ${payload.repository.html_url}`,
-				notified: true,
+				expect(notified).toEqual(false);
 			});
-		});
 
-		it("returns 'streamlabs.notified' set to false if something goes wrong with StreamLabs", async () => {
-			streamlabs.alert.mockImplementationOnce(async () => {
-				throw new Error('boooom');
+			it("returns the 'message' and 'notified' set to true", async () => {
+				const { subject } = testBuilder();
+
+				const { streamlabs: response } = await subject.handle({ payload, userId: 'abc' });
+
+				expect(response).toEqual({
+					notified: true,
+					message: `*${payload.sender.login}* just starred *${payload.repository.full_name}*`,
+				});
 			});
-			const subject = new Star(twitchChat, streamlabs);
 
-			const {
-				streamlabs: { notified },
-			} = await subject.handle({ payload });
+			it("returns 'notified' set to false if the sender is a spammer", async () => {
+				const { subject, gitEventHistoryRepository } = testBuilder();
+				jest
+					.spyOn(gitEventHistoryRepository, 'findLastEventFromUser')
+					.mockImplementation(async () =>
+						GitEventBuilder.build({ sender: payload.sender.login, timestamp: new Date() }),
+					);
 
-			expect(notified).toEqual(false);
-		});
+				const {
+					streamlabs: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
 
-		it("returns 'streamlabs' with the message send to StreamLabs and notified set to true", async () => {
-			const subject = new Star(twitchChat, streamlabs);
+				expect(notified).toEqual(false);
+			});
 
-			const { streamlabs: response } = await subject.handle({ payload });
+			it("returns 'notified' set to true if user sender has an event older than 5 minutes", async () => {
+				const { subject, gitEventHistoryRepository } = testBuilder();
+				jest
+					.spyOn(gitEventHistoryRepository, 'findLastEventFromUser')
+					.mockImplementation(async () =>
+						GitEventBuilder.build({
+							sender: payload.sender.login,
+							timestamp: new Date('2020-10-20'),
+						}),
+					);
 
-			expect(response).toEqual({
-				notified: true,
-				message: `*${payload.sender.login}* just starred *${payload.repository.full_name}*`,
+				const {
+					streamlabs: { notified },
+				} = await subject.handle({ payload, userId: 'abc' });
+
+				expect(notified).toEqual(true);
 			});
 		});
 	});
 
 	describe('#canHandle', () => {
 		it('returns true if the event is star and actions is created', () => {
-			const subject = new Star(twitchChat, streamlabs);
+			const { subject } = testBuilder();
 
 			const result = subject.canHandle({
 				event: 'star',
@@ -90,7 +167,7 @@ describe('Star', () => {
 		});
 
 		it('returns false if the event is star and actions is removed', () => {
-			const subject = new Star(twitchChat, streamlabs);
+			const { subject } = testBuilder();
 
 			const result = subject.canHandle({
 				event: 'star',
