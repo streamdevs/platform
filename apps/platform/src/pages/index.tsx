@@ -1,21 +1,22 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { Button } from 'ui';
 
-export default function Web() {
+export default function Home() {
 	const { data: session } = useSession();
 
-	if (session) {
+	if (!session) {
 		return (
 			<>
-				Signed in as {session.user.email} <br />
-				<Button onClick={() => signOut()}>Sign out</Button>
+				Not signed in <br />
+				<Button onClick={() => signIn()}>Sign in</Button>
 			</>
 		);
 	}
+
 	return (
 		<>
-			Not signed in <br />
-			<Button onClick={() => signIn('twitch')}>Sign in</Button>
+			Signed in as {session.user.email} <br />
+			<Button onClick={() => signOut()}>Sign out</Button>
 		</>
 	);
 }
